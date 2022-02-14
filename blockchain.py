@@ -4,6 +4,7 @@ import json
 
 DIFFICULTY = 4
 
+
 class Block:
     def __init__(self, index, timestamp, transactions, previous_hash, proof):
         self.index = index
@@ -14,11 +15,14 @@ class Block:
         self.hash = self.hash()
 
     def hash(self):
-        block_string = json.dumps(self.__dict__, sort_keys=True).encode()
+        data = self.__dict__
+        data['transactions'] = [t.__dict__ for t in self.transactions]
+        block_string = json.dumps(data, sort_keys=True).encode()
         return hashlib.sha256(block_string).hexdigest()
 
-    def toJSON(self):
-        return json.dumps(self, default=lambda o: o.__dict__, sort_keys=True, indent=4)
+    # def toJSON(self):
+    #     return json.dumps(self, default=lambda o: o.__dict__, sort_keys=True, indent=4)
+
 
 class Transaction:
     def __init__(self, sender, recipient, amount):
@@ -37,7 +41,7 @@ class Blockchain:
         self.transactions = []
 
     def create_first_block(self):
-        return Block(0, time(), None, None, None)
+        return Block(1, time(), [], 1, 100)
 
     def new_transaction(self, transaction):
         self.transactions.append(transaction)

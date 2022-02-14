@@ -1,5 +1,5 @@
 import hashlib
-from datetime import datetime
+from time import time
 import json
 
 DIFFICULTY = 4
@@ -16,6 +16,9 @@ class Block:
     def hash(self):
         block_string = json.dumps(self.__dict__, sort_keys=True).encode()
         return hashlib.sha256(block_string).hexdigest()
+
+    def toJSON(self):
+        return json.dumps(self, default=lambda o: o.__dict__, sort_keys=True, indent=4)
 
 class Transaction:
     def __init__(self, sender, recipient, amount):
@@ -34,7 +37,7 @@ class Blockchain:
         self.transactions = []
 
     def create_first_block(self):
-        return Block(0, datetime.now(), None, None, None)
+        return Block(0, time(), None, None, None)
 
     def new_transaction(self, transaction):
         self.transactions.append(transaction)

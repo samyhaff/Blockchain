@@ -1,39 +1,56 @@
 import hashlib
 from datetime import datetime
+import json
+
+DIFFICULTY = 4
 
 class Block:
-    def __init__(self, index, timestamp, data, previous_hash):
+    def __init__(self, index, timestamp, transactions, previous_hash, proof):
         self.index = index
         self.timestamp = timestamp
-        self.data = data
+        self.transactions = transactions
         self.previous_hash = previous_hash
-        self.hash = self.hash_block()
+        self.proof = proof
+        self.hash = self.hash()
 
-    def hash_block(self):
-        sha = hashlib.sha256()
-        sha.update(
-            str(self.index).encode()
-            + str(self.timestamp).encode()
-            + str(self.data).encode()
-            + str(self.previous_hash).encode()
-        )
-        return sha.hexdigest()
+    def hash(self):
+        block_string = json.dumps(self.__dict__, sort_keys=True).encode()
+        return hashlib.sha256(block_string).hexdigest()
 
-def create_first_block():
-    return Block(0, datetime.now(), 'First Block', '0')
+class Transaction:
+    def __init__(self, sender, recipient, amount):
+        self.sender = sender
+        self.recipient = recipient
+        self.amount = amount
 
-def create_next_block(last_block):
-    index = last_block.index + 1
-    timestamp = datetime.now()
-    data = "Test" + str(index)
-    hash = last_block.hash
+    def __str__(self):
+        return f"FROM: {self.sender} TO: {self.recipient} AMOUNT: {self.amount}"
 
-    return Block(index, timestamp, data, hash)
 
-if __name__ == '__main__':
-    first_block = create_first_block()
-    blockchain = [first_block]
+class Blockchain:
+    def __init__(self):
+        self.blocks = []
+        self.blocks.append(self.create_first_block())
+        self.transactions = []
 
-    block = create_next_block(first_block)
-    print(f"Block #{block.index} has been added to the blockchain")
-    print(f"Hash: {block.hash}")
+    def create_first_block(self):
+        return Block(0, datetime.now(), None, None, None)
+
+    def new_transaction(self, transaction):
+        self.transactions.append(transaction)
+
+    def new_block(self, block):
+        self.transactions = []
+        self.blocks.append(block)
+
+    def proof_of_work(self, last_proof):
+        proof = 0
+        while not self.valid_proof(proof, last_proof):
+            proof += 1
+        return proof
+
+    @staticmethod
+    def valid_proof(proof, last_proof):
+        guess = f"{last_proof}{proof}".encode()
+        guess_hash = hashlib.sha256(guess).hexdigest()
+        return guess_hash[:DIFFICULTY] == "0" * DIFFICULTY

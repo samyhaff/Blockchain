@@ -2,6 +2,7 @@ import hashlib
 from time import time
 import json
 import requests
+from urllib.parse import urlparse
 
 DIFFICULTY = 4
 
@@ -43,7 +44,8 @@ class Blockchain:
         self.nodes = set()
 
     def register_node(self, address):
-        self.nodes.add(address)
+        parsed_url = urlparse(address).netloc
+        self.nodes.add(parsed_url)
 
     def create_first_block(self):
         return Block(1, time(), [], 1, 100)
@@ -92,4 +94,4 @@ class Blockchain:
 
         for node in neighbours:
             response = requests.get(f'http://{node}/chain')
-            print(response)
+

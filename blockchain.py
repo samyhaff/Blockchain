@@ -18,7 +18,7 @@ class Block:
 
     def hash(self):
         data = self.__dict__
-        data['transactions'] = [t.__dict__ for t in self.transactions]
+        data["transactions"] = [t.__dict__ for t in self.transactions]
         block_string = json.dumps(data, sort_keys=True).encode()
         return hashlib.sha256(block_string).hexdigest()
 
@@ -63,17 +63,24 @@ class Blockchain:
             proof += 1
         return proof
 
+    @staticmethod
+    def valid_proof(proof, last_proof):
+        guess = f"{last_proof}{proof}".encode()
+        guess_hash = hashlib.sha256(guess).hexdigest()
+        return guess_hash[:DIFFICULTY] == "0" * DIFFICULTY
+
     def valid_chain(self, chain):
         last_block = chain[0]
         current_index = 1
 
         while current_index < len(chain):
             block = chain[current_index]
+            print(block)
 
-            if block.previous_hash != last_block.hash:
+            if block['previous_hash'] != last_block['hash']:
                 return False
 
-            if not self.valid_proof(block.prrof, last_block.proof):
+            if not self.valid_proof(block["proof"], last_block["proof"]):
                 return False
 
             last_block = block
@@ -81,17 +88,23 @@ class Blockchain:
 
         return True
 
-    @staticmethod
-    def valid_proof(proof, last_proof):
-        guess = f"{last_proof}{proof}".encode()
-        guess_hash = hashlib.sha256(guess).hexdigest()
-        return guess_hash[:DIFFICULTY] == "0" * DIFFICULTY
-
     def resolve_conflicts(self):
         neighbours = self.nodes
         new_chain = None
         max_lengh = len(self.blocks)
 
         for node in neighbours:
-            response = requests.get(f'http://{node}/chain')
+            response = requests.get(f"http://{node}/chain")
+            chain = response.json()
 
+            length = len(chain)
+
+            if length > max_lengh and self.valid_chain(chain):
+                max_lengh = length
+                new_chain = chain
+
+        if new_chain:
+            self.chain = new_chain
+            return True
+
+        return False

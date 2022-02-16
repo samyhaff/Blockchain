@@ -26,15 +26,17 @@ def mine():
 
     transaction = Transaction("Network", node_identifier, 50)
     blockchain.new_transaction(transaction)
-    block = Block(len(blockchain.blocks) + 1,
-                  time(),
-                  blockchain.transactions,
-                  last_block.hash,
-                  proof
-                  )
+    block = Block(
+        len(blockchain.blocks) + 1,
+        time(),
+        blockchain.transactions,
+        last_block.hash,
+        proof,
+    )
     blockchain.new_block(block)
 
     return "New block forged!\n"
+
 
 @app.route("/transactions/new", methods=["POST"])
 def new_transaction():
@@ -49,19 +51,30 @@ def new_transaction():
 def chain():
     return json.dumps([b.__dict__ for b in blockchain.blocks])
 
-@app.route("/nodes", methods=['GET'])
+
+@app.route("/nodes", methods=["GET"])
 def nodes():
     return json.dumps(list(blockchain.nodes))
 
-@app.route("/register", methods=['POST'])
+
+@app.route("/register", methods=["POST"])
 def register_nodes():
     values = request.get_json()
-    nodes = values['nodes']
+    nodes = values["nodes"]
 
     for node in nodes:
         blockchain.register_node(node)
 
     return "New node has been added\n"
+
+@app.route('/resolve', methods=['GET'])
+def consensus():
+    replaced = blockchain.resolve_conflicts()
+
+    if replaced:
+        return "Our chain was replaced!\n"
+
+    return "Our chain was not replaced.\n"
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=port)

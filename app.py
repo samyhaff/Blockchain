@@ -3,6 +3,13 @@ from flask import Flask, request
 import json
 from uuid import uuid4
 from blockchain import Blockchain, Transaction, Block
+import argparse
+
+parser = argparse.ArgumentParser(description="A blockchain simulation")
+parser.add_argument("-p", "--port", type=int, help="Port number", default=5000)
+
+args = parser.parse_args()
+port = args.port
 
 app = Flask(__name__)
 
@@ -42,6 +49,19 @@ def new_transaction():
 def chain():
     return json.dumps([b.__dict__ for b in blockchain.blocks])
 
+@app.route("/nodes", methods=['GET'])
+def nodes():
+    return json.dumps(list(blockchain.nodes))
+
+@app.route("/register", methods=['POST'])
+def register_nodes():
+    values = request.get_json()
+    nodes = values['nodes']
+
+    for node in nodes:
+        blockchain.register_node(node)
+
+    return "New node has been added\n"
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000)
+    app.run(host="0.0.0.0", port=port)

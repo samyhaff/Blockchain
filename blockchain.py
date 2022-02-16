@@ -1,6 +1,7 @@
 import hashlib
 from time import time
 import json
+import requests
 
 DIFFICULTY = 4
 
@@ -39,6 +40,10 @@ class Blockchain:
         self.blocks = []
         self.blocks.append(self.create_first_block())
         self.transactions = []
+        self.nodes = set()
+
+    def register_node(self, address):
+        self.nodes.add(address)
 
     def create_first_block(self):
         return Block(1, time(), [], 1, 100)
@@ -56,8 +61,35 @@ class Blockchain:
             proof += 1
         return proof
 
+    def valid_chain(self, chain):
+        last_block = chain[0]
+        current_index = 1
+
+        while current_index < len(chain):
+            block = chain[current_index]
+
+            if block.previous_hash != last_block.hash:
+                return False
+
+            if not self.valid_proof(block.prrof, last_block.proof):
+                return False
+
+            last_block = block
+            current_index += 1
+
+        return True
+
     @staticmethod
     def valid_proof(proof, last_proof):
         guess = f"{last_proof}{proof}".encode()
         guess_hash = hashlib.sha256(guess).hexdigest()
         return guess_hash[:DIFFICULTY] == "0" * DIFFICULTY
+
+    def resolve_conflicts(self):
+        neighbours = self.nodes
+        new_chain = None
+        max_lengh = len(self.blocks)
+
+        for node in neighbours:
+            response = requests.get(f'http://{node}/chain')
+            print(response)

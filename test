@@ -3,4 +3,6 @@
 curl "localhost:5123/register" -H "Content-Type: application/json" -d '{"nodes": ["http://127.0.0.1:5000"]}'
 curl "localhost:5000/transactions/new" -H "Content-Type: application/json" -d '{"sender": "marc", "recipient": "samy", "amount": 50}'
 curl "localhost:5000/mine"
+curl -s "localhost:5000/chain" | jq
+curl -s "localhost:5123/chain" | jq
 curl "localhost:5123/resolve"

@@ -75,9 +75,8 @@ class Blockchain:
 
         while current_index < len(chain):
             block = chain[current_index]
-            print(block)
 
-            if block['previous_hash'] != last_block['hash']:
+            if block["previous_hash"] != last_block["hash"]:
                 return False
 
             if not self.valid_proof(block["proof"], last_block["proof"]):

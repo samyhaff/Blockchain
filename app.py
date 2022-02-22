@@ -67,7 +67,8 @@ def register_nodes():
 
     return "New node has been added\n"
 
-@app.route('/resolve', methods=['GET'])
+
+@app.route("/resolve", methods=["GET"])
 def consensus():
     replaced = blockchain.resolve_conflicts()
 
@@ -75,6 +76,7 @@ def consensus():
         return "Our chain was replaced!\n"
 
     return "Our chain was not replaced.\n"
+
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=port)

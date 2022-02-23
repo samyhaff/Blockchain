@@ -6,7 +6,7 @@ from blockchain import Blockchain, Transaction, Block
 import argparse
 
 parser = argparse.ArgumentParser(description="A blockchain simulation")
-parser.add_argument("-p", "--port", type=int, help="Port number", default=5000)
+parser.add_argument("-p", "--port", type=int, help="Port number", default=80)
 
 args = parser.parse_args()
 port = args.port

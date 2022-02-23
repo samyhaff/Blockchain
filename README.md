@@ -23,7 +23,7 @@ options:
 Or, using Docker:
 
 ```bash
-docker run -p 5000:5000 samyhaff/blockchain
+docker run -p PORT:80 samyhaff/blockchain
 ```
 
 ## TODO

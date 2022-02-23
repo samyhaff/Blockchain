@@ -103,7 +103,7 @@ class Blockchain:
                 new_chain = chain
 
         if new_chain:
-            self.chain = new_chain
+            self.blocks = new_chain
             return True
 
         return False

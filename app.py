@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 from time import time
 from flask import Flask, request
 import json

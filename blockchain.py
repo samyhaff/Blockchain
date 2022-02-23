@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 import hashlib
 from time import time
 import json

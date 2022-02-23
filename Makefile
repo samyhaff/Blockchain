@@ -6,5 +6,3 @@ build: update
 	docker-compose build node
 push: build
 	docker-compose push node
-
-

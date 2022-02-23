@@ -23,7 +23,7 @@ blockchain = Blockchain()
 
 @app.route("/mine", methods=["GET"])
 def mine():
-    """Mine samy coin."""
+    """Mine Samycoin."""
     last_block = blockchain.blocks[-1]
     last_proof = last_block.proof
     proof = blockchain.proof_of_work(last_proof)

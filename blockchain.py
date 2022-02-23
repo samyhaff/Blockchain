@@ -3,13 +3,14 @@
 import hashlib
 from time import time
 import json
-import requests
 from urllib.parse import urlparse
+import requests
 
 DIFFICULTY = 4
 
 
 class Block:
+    """Block of the blockkchain."""
     def __init__(self, index, timestamp, transactions, previous_hash, proof):
         self.index = index
         self.timestamp = timestamp
@@ -19,6 +20,7 @@ class Block:
         self.hash = self.hash()
 
     def hash(self):
+        """Hash the block using sha256."""
         data = self.__dict__
         data["transactions"] = [t.__dict__ for t in self.transactions]
         block_string = json.dumps(data, sort_keys=True).encode()
@@ -29,6 +31,7 @@ class Block:
 
 
 class Transaction:
+    """Transaction class."""
     def __init__(self, sender, recipient, amount):
         self.sender = sender
         self.recipient = recipient
@@ -39,6 +42,7 @@ class Transaction:
 
 
 class Blockchain:
+    """Blockchain class."""
     def __init__(self):
         self.blocks = []
         self.blocks.append(self.create_first_block())
@@ -46,20 +50,25 @@ class Blockchain:
         self.nodes = set()
 
     def register_node(self, address):
+        """Register a new node."""
         parsed_url = urlparse(address).netloc
         self.nodes.add(parsed_url)
 
     def create_first_block(self):
+        """create the initial block."""
         return Block(1, time(), [], 1, 100)
 
     def new_transaction(self, transaction):
+        """Add a new transaction."""
         self.transactions.append(transaction)
 
     def new_block(self, block):
+        """Add a new block."""
         self.transactions = []
         self.blocks.append(block)
 
     def proof_of_work(self, last_proof):
+        """Computes the proof."""
         proof = 0
         while not self.valid_proof(proof, last_proof):
             proof += 1
@@ -67,11 +76,13 @@ class Blockchain:
 
     @staticmethod
     def valid_proof(proof, last_proof):
+        """Tests proof."""
         guess = f"{last_proof}{proof}".encode()
         guess_hash = hashlib.sha256(guess).hexdigest()
         return guess_hash[:DIFFICULTY] == "0" * DIFFICULTY
 
     def valid_chain(self, chain):
+        """Tests the validity of a chain."""
         last_block = chain[0]
         current_index = 1
 
@@ -90,6 +101,7 @@ class Blockchain:
         return True
 
     def json_to_transactions(self, transactions_json):
+        """Converts json to a list of transactions."""
         transactions = [
             Transaction(
                 transaction["sender"],
@@ -102,6 +114,7 @@ class Blockchain:
         return transactions
 
     def json_to_chain(self, chain_json):
+        """Convert json to a chain."""
         chain = [
             Block(
                 block["index"],
@@ -116,6 +129,7 @@ class Blockchain:
         return chain
 
     def resolve_conflicts(self):
+        """Resolve conflicts using the consensus algorithm."""
         neighbours = self.nodes
         new_chain = None
         max_lengh = len(self.blocks)

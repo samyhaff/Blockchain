@@ -1,0 +1,8 @@
+version: "3.9"
+services:
+  node:
+    image: samyhaff/blockchain
+    restart: unless-stopped
+    build: .
+    ports:
+      - "8000:80"

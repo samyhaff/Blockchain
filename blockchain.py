@@ -87,6 +87,32 @@ class Blockchain:
 
         return True
 
+    def jsonToTransaction(self, transactions_json):
+        transactions = [
+            Transaction(
+                transaction["sender"],
+                transaction["recipient"],
+                transaction["amount"],
+            )
+            for transaction in transactions_json
+        ]
+
+        return transactions
+
+    def jsonToChain(self, chain_json):
+        chain = [
+            Block(
+                block["index"],
+                block["timestamp"],
+                self.jsonToTransaction(block["transactions"]),
+                block["previous_hash"],
+                block["proof"],
+            )
+            for block in chain_json
+        ]
+
+        return chain
+
     def resolve_conflicts(self):
         neighbours = self.nodes
         new_chain = None
@@ -100,7 +126,7 @@ class Blockchain:
 
             if length > max_lengh and self.valid_chain(chain):
                 max_lengh = length
-                new_chain = chain
+                new_chain = self.jsonToChain(chain)
 
         if new_chain:
             self.blocks = new_chain
